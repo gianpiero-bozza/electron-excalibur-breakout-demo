@@ -7,46 +7,46 @@
 
 // Create an instance of the engine.
 var game = new ex.Engine({
-    width: 800,
-    height: 600,
-  })
-  
-  // Create an actor with x position of 150px,
-  // y position of 40px from the bottom of the screen,
-  // width of 200px, height and a height of 20px
-  var paddle = new ex.Actor(150, game.drawHeight - 40, 200, 20)
-  
-  // Let's give it some color with one of the predefined
-  // color constants
-  paddle.color = ex.Color.Chartreuse
-  
-  // Make sure the paddle can partipate in collisions, by default excalibur actors do not collide
-  paddle.collisionType = ex.CollisionType.Fixed
-  
-  // `game.add` is the same as calling
-  // `game.currentScene.add`
-  game.add(paddle)
+  width: 800,
+  height: 600,
+})
 
-  game.input.pointers.primary.on('move', function(evt) {
-    paddle.pos.x = evt.target.lastWorldPos.x
-  })
+// Create an actor with x position of 150px,
+// y position of 40px from the bottom of the screen,
+// width of 200px, height and a height of 20px
+var paddle = new ex.Actor(150, game.drawHeight - 40, 200, 20)
 
-  var ball = new ex.Actor(100, 300, 20, 20)
+// Let's give it some color with one of the predefined
+// color constants
+paddle.color = ex.Color.Chartreuse
+
+// Make sure the paddle can partipate in collisions, by default excalibur actors do not collide
+paddle.collisionType = ex.CollisionType.Fixed
+
+// `game.add` is the same as calling
+// `game.currentScene.add`
+game.add(paddle)
+
+game.input.pointers.primary.on('move', function (evt) {
+  paddle.pos.x = evt.target.lastWorldPos.x
+})
+
+var ball = new ex.Actor(100, 300, 20, 20)
 
 // Set the color
 ball.color = ex.Color.Red
 
-ball.draw = function(ctx, delta) {
-    // Optionally call original 'base' method
-    // ex.Actor.prototype.draw.call(this, ctx, delta)
-  
-    // Custom draw code
-    ctx.fillStyle = this.color.toString()
-    ctx.beginPath()
-    ctx.arc(this.pos.x, this.pos.y, 10, 0, Math.PI * 2)
-    ctx.closePath()
-    ctx.fill()
-  }
+ball.draw = function (ctx, delta) {
+  // Optionally call original 'base' method
+  // ex.Actor.prototype.draw.call(this, ctx, delta)
+
+  // Custom draw code
+  ctx.fillStyle = this.color.toString()
+  ctx.beginPath()
+  ctx.arc(this.pos.x, this.pos.y, 10, 0, Math.PI * 2)
+  ctx.closePath()
+  ctx.fill()
+}
 
 // Set the velocity in pixels per second
 ball.vel.setTo(200, 200)
@@ -60,52 +60,52 @@ ball.collisionType = ex.CollisionType.Passive
 // "ex.CollisionType.Fixed - this means participate, but this object is unmovable"
 
 // On collision remove the brick, bounce the ball
-ball.on('precollision', function(ev) {
-    if (bricks.indexOf(ev.other) > -1) {
-      // kill removes an actor from the current scene
-      // therefore it will no longer be drawn or updated
-      ev.other.kill()
-    }
-  
-    // reverse course after any collision
-    // intersections are the direction body A has to move to not be clipping body B
-    // `ev.intersection` is a vector `normalize()` will make the length of it 1
-    // `negate()` flips the direction of the vector
-    var intersection = ev.intersection.normalize()
-  
-    // The largest component of intersection is our axis to flip
-    if (Math.abs(intersection.x) > Math.abs(intersection.y)) {
-      ball.vel.x *= -1
-    } else {
-      ball.vel.y *= -1
-    }
-  })
+ball.on('precollision', function (ev) {
+  if (bricks.indexOf(ev.other) > -1) {
+    // kill removes an actor from the current scene
+    // therefore it will no longer be drawn or updated
+    ev.other.kill()
+  }
+
+  // reverse course after any collision
+  // intersections are the direction body A has to move to not be clipping body B
+  // `ev.intersection` is a vector `normalize()` will make the length of it 1
+  // `negate()` flips the direction of the vector
+  var intersection = ev.intersection.normalize()
+
+  // The largest component of intersection is our axis to flip
+  if (Math.abs(intersection.x) > Math.abs(intersection.y)) {
+    ball.vel.x *= -1
+  } else {
+    ball.vel.y *= -1
+  }
+})
 
 // Add the ball to the current scene
 // Wire up to the postupdate event
-ball.on('postupdate', function() {
-    // If the ball collides with the left side
-    // of the screen reverse the x velocity
-    if (this.pos.x < this.width / 2) {
-      this.vel.x *= -1
-    }
-  
-    // If the ball collides with the right side
-    // of the screen reverse the x velocity
-    if (this.pos.x + this.width / 2 > game.drawWidth) {
-      this.vel.x *= -1
-    }
-  
-    // If the ball collides with the top
-    // of the screen reverse the y velocity
-    if (this.pos.y < this.height / 2) {
-      this.vel.y *= -1
-    }
-  })
+ball.on('postupdate', function () {
+  // If the ball collides with the left side
+  // of the screen reverse the x velocity
+  if (this.pos.x < this.width / 2) {
+    this.vel.x *= -1
+  }
 
-  ball.on('exitviewport', function() {
-    alert('You lose!')
-  })
+  // If the ball collides with the right side
+  // of the screen reverse the x velocity
+  if (this.pos.x + this.width / 2 > game.drawWidth) {
+    this.vel.x *= -1
+  }
+
+  // If the ball collides with the top
+  // of the screen reverse the y velocity
+  if (this.pos.y < this.height / 2) {
+    this.vel.y *= -1
+  }
+})
+
+ball.on('exitviewport', function () {
+  alert('You lose!')
+})
 
 game.add(ball)
 
@@ -138,13 +138,13 @@ for (var j = 0; j < rows; j++) {
   }
 }
 
-bricks.forEach(function(brick) {
+bricks.forEach(function (brick) {
   // Make sure that bricks can participate in collisions
   brick.collisionType = ex.CollisionType.Active
 
   // Add the brick to the current scene to be drawn
   game.add(brick)
 })
-  
+
 // Start the engine to begin the game.
 game.start()
